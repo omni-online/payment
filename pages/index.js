@@ -3,6 +3,27 @@ import Head from 'next/head'
 
 const noop = () => {}
 
+const getParameterByName = (name) => {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+  const url = window.location.href
+  const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`)
+  const results = regex.exec(url)
+
+  if (!results) {
+    return null
+  }
+
+  if (!results[2]) {
+    return ''
+  }
+
+  return decodeURIComponent(results[2].replace(/\+/g, ' '))
+}
+
+const getP = () => parseInt(getParameterByName('p')) || 100000
+
 export default () => (
   <main>
     <Head>
@@ -13,17 +34,18 @@ export default () => (
 
     <p>Use the button below to begin processing a payment. Be sure to include your contact email so we can match it with the invoice</p>
 
-    {process.env.NODE_ENV === 'develop' && (<aside>STRIPE_KEY: {process.env.STRIPE_KEY}</aside>)}
+    {process.env.NODE_ENV === 'development' && (<aside>STRIPE_KEY: {process.env.STRIPE_KEY}</aside>)}
 
     <StripeCheckout
       name='Omni Online LLC'
       token={noop}
-      panelLabel='Pay Now'
+      amount={getP()}
+      panelLabel='Pay'
       currency='USD'
       locale='en'
       stripeKey={process.env.STRIPE_KEY}>
       <button className='btn btn-success text-uppercase px-4 py-3'>
-        Pay Now
+        Pay {`$${parseFloat(getP() / 100).toFixed(2)}`} Now
       </button>
       <style jsx>{`
         button {
