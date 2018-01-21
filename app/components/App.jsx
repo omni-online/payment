@@ -1,8 +1,6 @@
 import StripeCheckout from 'react-stripe-checkout'
 import React from 'react'
 
-const noop = () => {}
-
 const getParameterByName = (name) => {
   if (typeof window === 'undefined') {
     return ''
@@ -27,6 +25,7 @@ export default class extends React.Component {
     super(props)
 
     this.state = {}
+    this.onToken = this.onToken.bind(this)
   }
 
   componentDidMount () {
@@ -34,6 +33,10 @@ export default class extends React.Component {
     this.setState({
       amount
     })
+  }
+
+  onToken (token) {
+    console.log('TOKEN', token)
   }
 
   render () {
@@ -48,7 +51,7 @@ export default class extends React.Component {
 
         <StripeCheckout
           name='Omni Online LLC'
-          token={noop}
+          token={this.onToken}
           amount={this.state.amount}
           panelLabel='Pay'
           currency='USD'
