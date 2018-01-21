@@ -3,8 +3,6 @@ import Head from 'next/head'
 
 const noop = () => {}
 
-console.dir(process.env.TEST)
-
 export default () => (
   <main>
     <Head>
@@ -12,7 +10,6 @@ export default () => (
     </Head>
     <h1>Omni Online LLC</h1>
     <h3>Payment Processing Form</h3>
-    <h6>{process.env.STRIPE_KEY}</h6>
 
     <p>Use the button below to begin processing a payment. Be sure to include your contact email so we can match it with the invoice</p>
 
