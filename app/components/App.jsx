@@ -1,8 +1,4 @@
-/*
- Build with the following repo: https://github.com/ruanyf/react-babel-webpack-boilerplate
-*/
 import StripeCheckout from 'react-stripe-checkout'
-import Head from 'next/head'
 import React from 'react'
 
 const noop = () => {}
@@ -27,16 +23,22 @@ const getParameterByName = (name) => {
 }
 
 export default class extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {}
+  }
+
   componentDidMount () {
-    this.amount = parseInt(getParameterByName('p')) || 100000
+    const amount = parseInt(getParameterByName('p')) || process.env.DEFAULT_PRICE || 100000
+    this.setState({
+      amount
+    })
   }
 
   render () {
     return (
       <main>
-        <Head>
-          <title>Omni Online LLC</title>
-        </Head>
         <h1>Omni Online LLC</h1>
         <h3>Payment Processing Form</h3>
 
@@ -47,13 +49,13 @@ export default class extends React.Component {
         <StripeCheckout
           name='Omni Online LLC'
           token={noop}
-          amount={this.amount}
+          amount={this.state.amount}
           panelLabel='Pay'
           currency='USD'
           locale='en'
           stripeKey={process.env.STRIPE_KEY}>
           <button className='btn btn-success text-uppercase px-4 py-3'>
-            Pay {`$${parseFloat(this.amount / 100).toFixed(2)}`} Now
+            Pay {`$${parseFloat(this.state.amount / 100).toFixed(2)}`} Now
           </button>
           <style jsx>{`
             button {
