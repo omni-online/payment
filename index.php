@@ -1,6 +1,24 @@
 <?php
-  define("STRIPE_PK", "pk_test_WHATEVER");
-  define("STRIPE_SK", "sk_test_WHATEVER")
+  if ($_GET) {
+    if (array_key_exists('preview', $_GET)) {
+      define("STRIPE_PK", "pk_test_TEST");
+      define("STRIPE_SK", "sk_test_TEST");
+    }
+
+    if (array_key_exists('cid', $_GET)) {
+      $cid = $_GET['cid'];
+
+      /**
+       * maybe check to make sure it is actually a real person,
+       * otherwise redirect to the url without any query params.
+       */
+    }
+  }
+
+  if (!STRIPE_PK) {
+    define("STRIPE_PK", "pk_live_LIVE");
+    define("STRIPE_SK", "sk_live_LIVE");
+  }
 ?>
 
 
@@ -60,6 +78,16 @@
    -d email="paying.user@example.com" \
    -d source=tok_jhialK72293wzDSszByxYWd1
   */
+
+  /* Update existing credit information
+  curl https://api.stripe.com/v1/customers/cus_uAPbCxuZHVxFFi \
+     -u sk_test_DaJl1VIYuVXeZAwdJ9wlysp5: \
+     -d source=tok_SeVOXMg5Td6bGXTFn3yLhFAD
+  */
+
+
+        $url = ($cid ? 'https://api.stripe.com/v1/customers/' . $cid : 'https://api.stripe.com/v1/customers');
+
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array(
@@ -71,7 +99,7 @@
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($curl, CURLOPT_USERPWD, STRIPE_SK . ":");
 
-        curl_setopt($curl, CURLOPT_URL, "https://api.stripe.com/v1/customers");
+        curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         $result = json_decode(curl_exec($curl), true);
@@ -89,7 +117,7 @@
         <?php } else { // end error check ?>
           <div class="alert success">
             <p>Congratulations!</p>
-            Customer "<?php echo $result['id'] ?>" has been successfully created. You can now close this window.
+            Customer "<?php echo $result['id'] ?>" has been successfully <?php echo ($cid ? "updated" : "created") ?>. You can now close this window.
           </div>
         <?php } ?>
       <?php } ?>
@@ -102,6 +130,7 @@
         data-key="<?php echo STRIPE_PK ?>"
         data-name="Omni Online LLC"
         data-description="Create a payment option"
+        data-allow-remember-me=false
         data-locale="auto">
       </script>
       </form>
