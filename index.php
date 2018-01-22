@@ -15,7 +15,7 @@
     }
   }
 
-  if (!STRIPE_PK) {
+  if (!defined('STRIPE_PK')) {
     define("STRIPE_PK", "pk_live_LIVE");
     define("STRIPE_SK", "sk_live_LIVE");
   }
@@ -25,26 +25,78 @@
 <html>
   <head>
     <title>Omni Online LLC - Customer Creation Portal</title>
+    <!-- <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+    <!-- <script defer src="/js/fontawesome/fontawesome-all.min.js"></script> -->
     <style>
       html, body {
         padding: 0;
         margin: 0;
-        color: #222;
+        color: #fff;
         background: #fefefe;
-        font-family: Helvatica, Arial, "sans-serif";
+        background: #090013;
+        font-family: 'Lato', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      .hide {
+        display: none;
+      }
+      .bg {
+        background-image: url('/img/space.jpg');
+        background-size: cover;
+        opacity: .2;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      header {
+        position: relative;
+        z-index: 10;
+      }
+      .logo--img {
+        margin: 20px 0 80px 20px;
       }
 
       main {
-        max-width: 800px;
-        width: 100%;
-        padding: 1em;
-        background: #fff;
-        margin: 1em auto;
+        max-width: 400px;
+        width: 80vw;
+        margin: 0 auto;
         box-sizing: border-box;
+        position: relative;
+        z-index: 10;
       }
 
       h1 {
-        font-size: 1.5em;
+        font-size: 2em;
+        font-weight: 400;
+      }
+      @media screen and (min-width: 550px) {
+        h1 {
+          font-size: 2.5em;
+        }
+      }
+
+      p {
+        color: hsla(0,100%,100%,.6);
+      }
+      p b {
+        color: hsla(0,100%,100%,1);
+        margin: 0 2px;
+      }
+      .stripe-button-el {
+        margin-top: 20px;
+      }
+      button.stripe-button-el span {
+        padding: 4px 18px;
       }
 
       .alert {
@@ -53,22 +105,43 @@
 
       .alert p {
         margin: 0;
-        font-weight: bold;
       }
 
       .success {
-        background: #efe;
+        border: 1px solid #97d297;
+        border-radius: 10px;
+        margin: 40px 0 20px;
+      }
+      .success, .success p {
+        color: #97d297;
       }
 
       .error {
-        background: #fee;
+        border: 1px solid #de2951;
+        border-radius: 10px;
+        margin: 40px 0 20px;
+      }
+      .error, .error b, .error p {
+        color: #de2951;
+      }
+
+      .processing {
+
       }
     </style>
   </head>
   <body>
+    <div class="bg"></div>
+    <header>
+      <img class="logo--img" src="/img/omni-online-logo.svg" width="200">
+    </header>
     <main>
-      <h1>Omni Online LLC - Customer Creation Portal</h1>
+      <h1>Pillar Hosting and Maintenance</h1>
+
+      <p>Enter billing information for your church's Pillar website hosting and maintenance. The cost is <b>$19.44/month</b>, and will begin on <b>February 1<sup>st</sup></b>.</p>
+
       <?php if ($_POST) {
+
         $email = $_POST["stripeEmail"];
         $token = $_POST["stripeToken"];
 
@@ -111,29 +184,31 @@
             $errorMsg = $result['error']['message'];
           } ?>
           <div class="alert error">
-            <p>Uh oh!</p>
+            <p><b>Uh oh!</b></p>
             <?php echo $errorMsg ?>
           </div>
         <?php } else { // end error check ?>
           <div class="alert success">
-            <p>Congratulations!</p>
-            Customer "<?php echo $result['id'] ?>" has been successfully <?php echo ($cid ? "updated" : "created") ?>. You can now close this window.
+            <p>Your billing information was submitted successfully!</p>
+            <!-- Customer "<?php echo $result['id'] ?>" has been successfully <?php echo ($cid ? "updated" : "created") ?>. You can now close this window. -->
           </div>
         <?php } ?>
       <?php } ?>
 
-      <p>Use the button below to begin processing a payment. Be sure to include your contact email so we can match it with the invoice</p>
-
       <form method="POST">
       <script
         src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+        data-zip-code="true"
+        data-billing-address="true"
         data-key="<?php echo STRIPE_PK ?>"
         data-name="Omni Online LLC"
+        data-label="Enter billing info"
         data-description="Create a payment option"
         data-allow-remember-me=false
         data-locale="auto">
       </script>
       </form>
+      <i class="hide processing fas fa-spinner fa-pulse"></i>
     </main>
   </body>
 </html>
